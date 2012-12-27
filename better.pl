@@ -13,6 +13,9 @@ use HTML::Entities;
 use Crypt::SSLeay;
 
 our $mech = WWW::Mechanize->new();
+our $mech = WWW::Mechanize->new (
+	timeout=>60,
+);
 our $username;
 our $password;
 our $flacdir;
@@ -68,6 +71,7 @@ sub getCfgValues
 sub initWeb
 {
 	my $login_url = 'https://what.cd/ajax.php?action=index';
+	$mech -> timeout;
 	$mech -> cookie_jar(HTTP::Cookies->new());
 	$mech -> get($login_url);
 	$mech->submit_form(
