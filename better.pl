@@ -105,13 +105,13 @@ sub initWeb
 }
 
 
-#get our better.pbp JSON object. In the future should be configurable.
+#get our better.php JSON object. In the future should be configurable.
 #maybe even support the use of tags as per: 
-#http://what.cd/forums.php?action=viewthread&threadid=66186&postid=3418797
+#https://what.cd/forums.php?action=viewthread&threadid=66186&postid=3418797
 sub getBetter
 {
-	#my $better_url = 'http://what.cd/ajax.php?action=better&method=single&authkey=' . $authkey;
-	my $better_url = 'http://what.cd/ajax.php?action=better&method=snatch&filter=seeding&authkey=' . $authkey;
+	#my $better_url = 'https://what.cd/ajax.php?action=better&method=single&authkey=' . $authkey;
+	my $better_url = 'https://what.cd/ajax.php?action=better&method=snatch&filter=seeding&authkey=' . $authkey;
 	if($debug eq "3") { print "DEBUG:		Getting better url\n$authkey\n"; }
 	$mech -> get($better_url);
 	my $better;
@@ -128,7 +128,7 @@ sub getBetter
 #better.php scraper until we have a JSON dump
 sub getBetterScrape
 {
-	my $better_url = 'http://what.cd/better.php?method=snatch&filter=seeding';
+	my $better_url = 'https://what.cd/better.php?method=snatch&filter=seeding';
 	$mech -> get($better_url);
 	my @links = $mech->find_all_links ( 
                                      url_regex => qr{torrents\.php\?id=}
