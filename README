@@ -1,11 +1,11 @@
 New bettertron, updated for ease of use with better error handling!
-===
+======
 
-//Installation:
-
+Installation:
+-----
 If you are running ubuntu/debian, this should get all of them:
 
-apt-get install mktorrent flac lame
+  $ apt-get install mktorrent flac lame
 
 If you don't have root access you can setup a local module installation with the following:
 
@@ -14,7 +14,7 @@ If you don't have root access you can setup a local module installation with the
   $ echo 'eval `perl -I ~/perl5/lib/perl5 -Mlocal::lib`' >> ~/.profile
   $ cpanm WWW::Mechanize, JSON, JSON::XS, Data::Dumper, Config::IniFiles, Bencode, Crypt::SSLeay
 
-If you have root access run the following:
+*If you have root access run the following:*
 
   $ sudo perl -MCPAN -e 'install WWW::Mechanize, JSON, JSON::XS, Data::Dumper, Config::IniFiles, Bencode, Crypt::SSLeay'
 
@@ -25,11 +25,11 @@ After that, simply run the better.pl script once. It will generate a config file
 
 Please fill it out:
 
-username = What.CD username
-password = What.CD password
-torrentdir = Torrent watch folder (new torrents go here)
-flacdir = Torrent data folder (looks for torrents here)
-transcodedir = Where new transcodes will go
+ - username = What.CD username
+ - password = What.CD password
+ - torrentdir = Torrent watch folder (new torrents go here)
+ - flacdir = Torrent data folder (looks for torrents here)
+ - transcodedir = Where new transcodes will go
 
 ---------------------------------------------------------------------
 TODO:
