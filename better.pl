@@ -161,12 +161,22 @@ sub process
 	my $media = '';
 	my $torrentName = '';
 	
+	my $torrentSize = '';
+	my $torrentBytes = '';
         for my $torrents( @{$group->{'response'}{'torrents'}} )
         {
                 if($torrents -> {'id'} eq $torrentId)
                 {
                         $remasterTitle = $torrents -> {'remasterTitle'};
 			$torrentName = decode_entities($torrents -> {'filePath'});
+			$torrentSize = $torrents -> {'size'};
+			$torrentBytes = $torrents -> {'size'};
+			#if($debug eq "1") { print "DEBUG:		Torrent Bytes: $torrentSize\n"; }
+			if ($torrentSize > 1048575) {
+ 				 $torrentSize = sprintf("%.2f MB",$torrentSize/1024/1024);#<-- Convert to MBs to two decimal places
+			elsif ($torrentSize > 1048576000) {
+				$torrentSize = sprintf("%.2f GB",$torrentSize/1024/1024/1024);
+			}
 			#handle special chars for most file systems? works on mine at least
 			$torrentName = encode('UTF-8', $torrentName);
 			$remasterYear = $torrents -> {'remasterYear'};
