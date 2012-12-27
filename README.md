@@ -2,7 +2,7 @@
 
 Bettertron is a tool that will scan your better.php. It will check a specified directory for your seeded FLACs and transcode them into the needed MP3 bitrates. It is edition aware and will transcode all the needed bitrates for the edition you are seeding, regardless of better.php.
 
-### Installation:
+### Installation & Dependencies:
 ***
 If you are running ubuntu/debian, this should get all of them:
 
