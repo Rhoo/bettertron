@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Bettertron by Rhoo</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Bettertron</h1>
+        <p>What.CD better.php transcoding and uploading automation!</p>
+
+        <p class="view"><a href="https://github.com/Rhoo/bettertron">View the Project on GitHub <small>Rhoo/bettertron</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/Rhoo/bettertron/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/Rhoo/bettertron/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/Rhoo/bettertron">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>New Bettertron, updated for ease of use with better error handling!</h1>
+
+<p>Bettertron is a tool that will scan your better.php. It will check a specified directory for your seeded FLACs and transcode them into the needed MP3 bitrates. It is edition aware and will transcode all the needed bitrates for the edition you are seeding, regardless of better.php.</p>
+
+<h3>Installation:</h3>
+
+<hr><p>If you are running ubuntu/debian, this should get all of them:
+    $ apt-get install mktorrent flac lame</p>
+
+<p>If you <em>don't</em> have root access you can setup a local module installation with the following:</p>
+
+<pre><code>$ wget -O- http://cpanmin.us | perl - -l ~/perl5 App::cpanminus local::lib
+$ eval `perl -I ~/perl5/lib/perl5 -Mlocal::lib`
+$ echo 'eval `perl -I ~/perl5/lib/perl5 -Mlocal::lib`' &gt;&gt; ~/.profile
+$ cpanm WWW::Mechanize, JSON, JSON::XS, Data::Dumper, Config::IniFiles, Bencode, Crypt::SSLeay
+</code></pre>
+
+<p>If you have root access run the following:</p>
+
+<pre><code>$ sudo perl -MCPAN -e 'install WWW::Mechanize, JSON, JSON::XS, Data::Dumper, Config::IniFiles, Bencode, Crypt::SSLeay'
+</code></pre>
+
+<p>After that, simply run the better.pl script. It will generate a config file called ~/.better - You will need to edit this before use.</p>
+
+<hr><ul>
+<li>username = What.CD username</li>
+<li>password = What.CD password</li>
+<li>torrentdir = Torrent watch folder (new torrents go here)</li>
+<li>flacdir = Torrent data folder (looks for torrents here)</li>
+<li>transcodedir = Where new transcodes will go</li>
+</ul><h3>TODO:</h3>
+
+<ul>
+<li>Provide progress report</li>
+<li>Remove useless info (torrent hashing etc)</li>
+<li>Auto ignore torrents unsuitable for upload which have been marked by user (ie. .ignore_transcode file</li>
+<li>Handle torrent upload errors more gracefully (had a couple rejected due to thumb.db restriction. </li>
+<li>Imagine 1982/original release/CD media will be a problem also)</li>
+<li>Better error or unexpected condition handling.
+***</li>
+</ul>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/Rhoo">Rhoo</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
