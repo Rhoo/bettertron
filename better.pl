@@ -329,6 +329,8 @@ sub process
 				$bitrateDropdown = $key;
 			}
 			#determine torrent file name
+			#determine torrent file name & remove trailing [FLAC]s
+			$torrentName =~ s/[\||\(|\[|\{| \|| \(| \[| \{]+[what.cd|FLAC]+[\}|\]|\)]//gi;
 			my $torrentFile = $torrentName . " (" . $key . ").torrent";
 
 			my $add_format_url = "http://what.cd/upload.php?groupid=" . $groupId;
