@@ -244,6 +244,9 @@ sub process
 	my $dirExists = undef;	
 	my $lossyMaster = 0;
 	
+	my $calc = '';
+	my $sizeDiff = '';
+	my $percent = '';
 	if(-d $fullDir)
 	{
 		$dirExists = 1;
@@ -252,7 +255,34 @@ sub process
 	{
 		$dirExists = 0;
 	}
+	if($dirExists == 1) {
+	my $calc = '';
+	$calc = `du -cbs "$fullDir" | tail -1 | awk {'print \$1'} 2>&1`;
+	if($debug eq "2") { print "DEBUG:		Actual bytes: $calc\n"; }
+	if($calc > $torrentBytes && $calc != 0) {
+		 $sizeDiff = (($calc - $torrentBytes) / $torrentBytes) * 100;
+		if($debug eq "2") { print "DEBUG:		torrentbytes -> realbytes\n"; }
+	} elsif($torrentBytes > $calc && $calc != 0) 				{
+		 $sizeDiff = (($torrentBytes - $calc) / $calc) * 100;
+		if($debug eq "2") { print "DEUBG:		realbytes -> torrentbyes or else\n"; }
+	}
+	else
+	{
+			die("Critical: Unable to determine size of local directory");
+	}
+	print "DEBUG:		Raw difference: $sizeDiff\n" if $debug eq "1" or "2";
 
+	
+	if($sizeDiff >= 1)	
+	{
+		#downloading check - if file is larger than 1% different
+		$percent = $sizeDiff > 0 ? 'larger' : 'smaller';
+		print "[!!!!] This file may be corrupt or unfinished - skipping. [!!!!]\n";
+		$dirExists = 0;
+	}
+		print "[----] Everything seems to be OK. [----]\n";
+	}
+					}
 	if($remasterTitle =~ m/pre-emphasis/i)
 	{
 		$lossyMaster = 1;
