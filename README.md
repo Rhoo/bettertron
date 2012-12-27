@@ -5,6 +5,7 @@ Bettertron is a tool that will scan your better.php. It will check a specified d
 ### Installation:
 ***
 If you are running ubuntu/debian, this should get all of them:
+
     $ apt-get install mktorrent flac lame
 
 If you _don't_ have root access you can setup a local module installation with the following:
@@ -33,4 +34,3 @@ After that, simply run the better.pl script. It will generate a config file call
  * Handle torrent upload errors more gracefully (had a couple rejected due to thumb.db restriction. 
  * Imagine 1982/original release/CD media will be a problem also)
  * Better error or unexpected condition handling.
-***
