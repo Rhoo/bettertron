@@ -29,6 +29,7 @@ my ($verbose, $notorrent, $zeropad, $moveother, $output, $passkey, $torrent_dir)
 ### VERSION 2.0
 
 my $cfg = Config::IniFiles->new( -file => "better.ini" );
+my $cfg = Config::IniFiles->new( -file => $ENV{"HOME"} . "/.better");
 
 # Do you always want to move additional files (.jpg, .log, etc)?
 $moveother = 1;
@@ -39,6 +40,7 @@ my $password = $cfg -> val('user', 'password');
 # Output folder unless specified: ("/home/samuel/Desktop/")
 $output = $cfg -> val('dirs', 'transcodedir');
 $torrent_dir = $cfg -> val('dirs', 'torrentdir');
+my $debug = $cfg -> val('dev', 'debug');
 
 my $pwd = getcwd();
 
@@ -61,6 +63,7 @@ password=>$password
 my $login_info = decode_json($mech -> content());
 $passkey = $login_info->{'response'}{'passkey'};
 
+print "DEBUG:		PASSKEY: $passkey\n" if $debug eq "2";
 
 # List of default encoding options, add to this list if you want more
 my %lame_options = (
@@ -100,8 +103,7 @@ GetOptions('verbose' => \$verbose, 'notorrent' => \$notorrent, 'zeropad', => \$z
 $output =~ s'/?$'/' if $output;	# Add a missing /
 
 unless (@flac_dirs) {
-	print "Need FLAC file parameter\n";
-	print "You can specify which lame encoding (V0, 320, ...) you want with --opt\n";
+	print "[!!!!] Need FLAC file parameter [!!!!]\n";
 	exit 0;
 }
 
@@ -146,6 +148,7 @@ foreach my $flac_dir (@flac_dirs) {
 	
 			# Build the conversion script and do the actual conversion
 			my $flac_command = "flac --totally-silent -dc \"$file\" | lame -S $lame_options{$lame_option} " .
+		$mp3_dir =~ s/[\||\(|\[|\{| \|| \(| \[| \{]+[what.cd|FLAC]+[\}|\]|\)]//gi; #removes trailing [FLAC] or (FLAC) from dir name
 				'--tt "' . $tags{'TITLE'} . '" ' .
 				'--tl "' . $tags{'ALBUM'} . '" ' .
 				'--ta "' . $tags{'ARTIST'} . '" ' .
