@@ -145,8 +145,8 @@ sub process
 	my $groupId = $_[0];
 	my $torrentId = $_[1];
 
-        print "GroupID: $groupId\n";
-        print "TorrentID: $torrentId\n";
+        print "[----] Group ID: $groupId [----]\n";
+        print "[----] Torrent ID: $torrentId [----]\n";
 
 
         my $group_url = 'http://what.cd/ajax.php?action=torrentgroup&id=' . $groupId . '&auth=' . $authkey;
@@ -176,8 +176,9 @@ sub process
 		}
 
         }
-	print "RemasterTitle: $remasterTitle\n";
-	print "TorrentName: $torrentName\n\n";
+	print "[----] Remaster Title: $remasterTitle [---]\n";
+	print "[----] Torrent Name: $torrentName [----]\n";
+	print "[----] Finished Size: $torrentSize [----]\n"; 
 	my %existing_encodes =
         (
         320 => '0',
@@ -250,22 +251,22 @@ sub process
 
         if($existing_encodes{'320'} == 1 && $existing_encodes{'V0'} == 1 && $existing_encodes{'V2'} == 1)
         {
-                print "Nothing to transcode. V2, V0, and 320 exist\n";
+                print "[++++] ERROR: Nothing to transcode. V2, V0, and 320 exist [++++]\n";
         }
 	elsif($dirExists == 0)
 	{
-		print "Cannot find directory to transcode. Skipping to next entry\n";
+		print "[++++] Cannot find directory to transcode. Skipping to next [++++]\n";
 	}
 	elsif($lossyMaster == 1)
 	{
-		print "This FLAC appears to be a lossy master. Skipping to next entry\n";
+		print "[++++] This FLAC appears to be a lossy master. Skipping to next entry [++++]\n";
 	}
 	else
         {
-                print "Running transcode with these options: $command\n";
+                print "[----] Running transcode [----]\n";
                 print "DEBUG: 		OPTS: $command" if $debug eq "2";
                 system($command);
-		print "Finished transcoding $torrentName\n";
+		print "[----] Finished transcoding $torrentName [----]\n";
         }
         my $addformat_url = "http://what.cd/upload.php?groupid=" . $groupId;
         $mech -> get($addformat_url);
@@ -300,11 +301,11 @@ sub process
 				
 			if($remasterYear == 0)
         		{
-				print "\n";
-				print "Starting Original Release upload:\n";
-				print "Format: MP3\n";
-				print "Bitrate: $bitrateDropdown\n";
 				print "Media: $media\n";
+				print "\n+++++++++++++++++++++++++++++++++++++++++++++++++\n";
+				print "[----] Format: 		MP3 [----]\n";
+				print "[----] Bitrate:		$bitrateDropdown [----]\n";
+				print "[----] Media:		$media [----]\n";
 				$mech -> get($add_format_url);
 				
 				$mech->form_id('upload_table');
@@ -314,19 +315,21 @@ sub process
 				$mech->select('media', $media);
 				
 				$mech->submit();
+				print "[----] Upload complete! [----]\n";
 			}
 			else
        			{
-       				print "Starting Edition Release upload:\n";
 				print "Edition: $remasterTitle\n";
-				print "Format: MP3\n";
                                 print "Bitrate: $bitrateDropdown\n";
-                                print "Media: $media\n";
+				print "[----] Edition: 				$remasterTitle [----]\n";
+				print "[----] Format: 							MP3 [----]\n";
+                                print "[----] Bitrate: $bitrateDropdown [----]\n";
+                                print "[----] Media: $media [----]\n";
 				$mech -> get($add_format_url);
 				
                                 $mech->form_id('upload_table');
                                 $mech->tick("remaster", 'on');
-				$mech->field('file_input', $uploadFile);
+                                $mech->field('file_input', $uploadFile);
                                 $mech->field('remaster_year', $remasterYear);
                                 $mech->field('remaster_title', $remasterTitle);
                                 $mech->field('remaster_record_label', $remasterRecordLabel);
@@ -355,7 +358,7 @@ sub process
 #argument checks
 if (@ARGV > 1 )
 {
-	print "usage: ./better.pl OR ./better.pl  'http://what.cd/torrents.php?id=1000&torrentid=1000000'";
+	print "usage: ./better.pl OR ./better.pl  'https://what.cd/torrents.php?id=1000&torrentid=1000000'";
 	exit;
 }
 if(@ARGV == 1 && $ARGV[0] !~ m/^https:\/\//)
@@ -365,7 +368,7 @@ if(@ARGV == 1 && $ARGV[0] !~ m/^https:\/\//)
 }
 chkCfg();
 getCfgValues();
-print "Done reading config file\n";
+print "[----] Configuration loaded, attempting to connect to What.CD [----]\n";
 initWeb();
 my $better = getBetter();
 
@@ -379,7 +382,7 @@ if(@ARGV == 1)
 }
 elsif (@ARGV == 0 && defined $better)
 {
-	print "Using JSON API for better.php source\n";
+	print "[----] Using JSON API for better.php source [----]\n";
 
 	for my $href ( @{$better->{'response'}} )
 	{
@@ -389,7 +392,7 @@ elsif (@ARGV == 0 && defined $better)
 		process($groupId, $torrentId);
 	
 		sleep 2;
-		print "-----------------------------------------------------------\n";
+		print "-------------------------------------------------------------------------------------\n";
 	}	
 }
 else
@@ -397,7 +400,7 @@ else
 	my @betterScrape = getBetterScrape();	
 	#print Dumper(\@betterScrape);
 	
-	print "JSON API did not return an answer. Fall back to scraping better.php directly\n\n\n";
+	print "[----] JSON API did not return an answer. Fall back to scraping better.php directly [----]\n";
 
 	foreach (@betterScrape)
 	{
@@ -417,7 +420,7 @@ else
 					$torrentId = (split('#', $torrentId))[0];
 					#print "$groupId $torrentId\n";
 					process($groupId, $torrentId);
-					print "-----------------------------------------------------------\n";
+					print "------------------------------------------------------------------------\n";
                         	}
 			}
 
