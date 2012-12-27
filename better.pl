@@ -23,6 +23,7 @@ our $transcodedir;
 our $torrentdir;
 our $passkey;
 our $authkey;
+our $debug;
 
 sub chkCfg
 {
@@ -41,6 +42,8 @@ password=
 torrentdir=/blah/example/
 flacdir=/look/another/
 transcodedir=/fill/this/in/with/trailing/slashes/
+[dev]
+debug=0
 ENDHTML
  		close (MYFILE);
 		exit 0;
@@ -63,6 +66,8 @@ sub getCfgValues
 	$transcodedir = $cfg -> val('dirs', 'transcodedir');
 	$torrentdir = $cfg -> val('dirs', 'torrentdir');
 
+	$debug = $cfg -> val('dev', 'debug');
+	print "DEBUG:		Enabled\n" if $debug eq 1 or 2;
 }
 
 
@@ -70,6 +75,10 @@ sub getCfgValues
 #Get our authkey for the API, passkey for torrent creation and so on.
 sub initWeb
 {
+	if($debug eq 1 or 2)
+	{ 
+		print "DEBUG: 		Getting cookie\n"; 
+	} 
 	my $login_url = 'https://what.cd/ajax.php?action=index';
 	$mech -> timeout;
 	$mech -> cookie_jar(HTTP::Cookies->new());
@@ -85,6 +94,10 @@ sub initWeb
 	my $login_info = decode_json($mech -> content());
 	$passkey = $login_info->{'response'}{'passkey'};
 	$authkey = $login_info->{'response'}{'authkey'};
+	if($debug eq 1 or 2)
+	 {
+		 print "DEBUG: 		Got cookie!\n";
+	 }
 }
 
 
@@ -95,8 +108,10 @@ sub getBetter
 {
 	#my $better_url = 'http://what.cd/ajax.php?action=better&method=single&authkey=' . $authkey;
 	my $better_url = 'http://what.cd/ajax.php?action=better&method=snatch&filter=seeding&authkey=' . $authkey;
+	if($debug eq "3") { print "DEBUG:		Getting better url\n$authkey\n"; }
 	$mech -> get($better_url);
 	my $better;
+	print "DEBUG:		var Better content $better\n" if $debug eq 1 or 2;
 	if($mech -> content() ne '')
 	{ 
 		$better = decode_json($mech -> content());
@@ -244,6 +259,7 @@ sub process
 	else
         {
                 print "Running transcode with these options: $command\n";
+                print "DEBUG: 		OPTS: $command" if $debug eq "2";
                 system($command);
 		print "Finished transcoding $torrentName\n";
         }
