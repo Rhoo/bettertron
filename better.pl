@@ -1,5 +1,4 @@
-#!/usr/bin/perl -w
-
+#!/usr/bin/perl -
 use strict; 
 use WWW::Mechanize;
 use JSON -support_by_pp;
@@ -12,7 +11,6 @@ use Encode;
 use HTML::Entities;
 use Crypt::SSLeay;
 
-our $mech = WWW::Mechanize->new();
 our $mech = WWW::Mechanize->new (
 	timeout=>60,
 );
@@ -27,14 +25,11 @@ our $debug;
 
 sub chkCfg
 {
-	unless (-e 'better.ini')
 	unless (-e $ENV{"HOME"} . "/.better")
 	{
  		print "Your are running Bettertron for the first time!\n";
-		print "Creating config file \"better.ini\"\n";
 		print "Creating config file .better in home directory\n";
 		print "Please read the README for how to fill out the config\n";
-		open (MYFILE, '>>better.ini');
 		open (MYFILE, ">> " . $ENV{"HOME"} . "/.better");
  		print MYFILE <<ENDHTML;
 [user]
@@ -54,11 +49,9 @@ ENDHTML
 	
 	
 }
-
 sub getCfgValues
 {
 	#init config reading object
-	my $cfg = Config::IniFiles->new( -file => "better.ini" );
 	my $cfg = Config::IniFiles->new( -file => $ENV{"HOME"} . "/.better" );
 
 	#Get username and password from config file.
@@ -69,7 +62,6 @@ sub getCfgValues
 	$flacdir = $cfg -> val('dirs', 'flacdir');
 	$transcodedir = $cfg -> val('dirs', 'transcodedir');
 	$torrentdir = $cfg -> val('dirs', 'torrentdir');
-
 	$debug = $cfg -> val('dev', 'debug');
 	print "DEBUG:		Enabled\n" if $debug eq 1 or 2;
 }
@@ -120,7 +112,8 @@ sub getBetter
 	{ 
 		$better = decode_json($mech -> content());
 	}
-	#print Dumper $better;
+	#if($debug eq "1") { print Dumper $better; }
+	#if($debug eq "1") { print  Dumper $better_url; }
 
 	return $better;
 }
@@ -130,6 +123,7 @@ sub getBetterScrape
 {
 	my $better_url = 'https://what.cd/better.php?method=snatch&filter=seeding';
 	$mech -> get($better_url);
+	#if($debug eq "1") { print "Matching"; }
 	my @links = $mech->find_all_links ( 
                                      url_regex => qr{torrents\.php\?id=}
                                 );
@@ -149,10 +143,10 @@ sub process
         print "[----] Torrent ID: $torrentId [----]\n";
 
 
-        my $group_url = 'http://what.cd/ajax.php?action=torrentgroup&id=' . $groupId . '&auth=' . $authkey;
+        my $group_url = 'https://what.cd/ajax.php?action=torrentgroup&id=' . $groupId . '&auth=' . $authkey;
         $mech -> get($group_url);
         my $group = decode_json($mech -> content());
-
+	#print $mech -> content();
 
         my $remasterTitle = '';
 	my $remasterYear = '';
@@ -160,7 +154,6 @@ sub process
 	my $remasterCatalogueNumber = '';
 	my $media = '';
 	my $torrentName = '';
-	
 	my $torrentSize = '';
 	my $torrentBytes = '';
         for my $torrents( @{$group->{'response'}{'torrents'}} )
@@ -174,6 +167,7 @@ sub process
 			#if($debug eq "1") { print "DEBUG:		Torrent Bytes: $torrentSize\n"; }
 			if ($torrentSize > 1048575) {
  				 $torrentSize = sprintf("%.2f MB",$torrentSize/1024/1024);#<-- Convert to MBs to two decimal places
+			}
 			elsif ($torrentSize > 1048576000) {
 				$torrentSize = sprintf("%.2f GB",$torrentSize/1024/1024/1024);
 			}
@@ -243,7 +237,6 @@ sub process
 	my $fullDir = $flacdir . $torrentName;
 	my $dirExists = undef;	
 	my $lossyMaster = 0;
-	
 	my $calc = '';
 	my $sizeDiff = '';
 	my $percent = '';
@@ -277,9 +270,12 @@ sub process
 	{
 		#downloading check - if file is larger than 1% different
 		$percent = $sizeDiff > 0 ? 'larger' : 'smaller';
+		printf "[!!!!] Expected size is %.2f%% $percent than disk size [!!!!]\n", abs $sizeDiff; 
 		print "[!!!!] This file may be corrupt or unfinished - skipping. [!!!!]\n";
 		$dirExists = 0;
 	}
+	else
+	{
 		print "[----] Everything seems to be OK. [----]\n";
 	}
 					}
@@ -308,7 +304,7 @@ sub process
                 system($command);
 		print "[----] Finished transcoding $torrentName [----]\n";
         }
-        my $addformat_url = "http://what.cd/upload.php?groupid=" . $groupId;
+        my $addformat_url = "https://what.cd/upload.php?groupid=" . $groupId;
         $mech -> get($addformat_url);
 
         #time to do the form post for uploading the torrent
@@ -328,13 +324,10 @@ sub process
 			{
 				$bitrateDropdown = $key;
 			}
-			#determine torrent file name
 			#determine torrent file name & remove trailing [FLAC]s
 			$torrentName =~ s/[\||\(|\[|\{| \|| \(| \[| \{]+[what.cd|FLAC]+[\}|\]|\)]//gi;
 			my $torrentFile = $torrentName . " (" . $key . ").torrent";
-
-			my $add_format_url = "http://what.cd/upload.php?groupid=" . $groupId;
-			
+			my $add_format_url = "https://what.cd/upload.php?groupid=" . $groupId;
 			my $uploadFile = [ 
     			$torrentFile,        # The file we are uploading to upload.
     			$torrentFile,     # The filename we want to give the web server.
@@ -343,8 +336,8 @@ sub process
 				
 			if($remasterYear == 0)
         		{
-				print "Media: $media\n";
 				print "\n+++++++++++++++++++++++++++++++++++++++++++++++++\n";
+				print "[----] Starting Original Release upload: [----]\n";
 				print "[----] Format: 		MP3 [----]\n";
 				print "[----] Bitrate:		$bitrateDropdown [----]\n";
 				print "[----] Media:		$media [----]\n";
@@ -361,8 +354,7 @@ sub process
 			}
 			else
        			{
-				print "Edition: $remasterTitle\n";
-                                print "Bitrate: $bitrateDropdown\n";
+       				print "[----] Starting Edition Release upload: [----]\n";
 				print "[----] Edition: 				$remasterTitle [----]\n";
 				print "[----] Format: 							MP3 [----]\n";
                                 print "[----] Bitrate: $bitrateDropdown [----]\n";
