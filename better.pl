@@ -28,11 +28,14 @@ our $debug;
 sub chkCfg
 {
 	unless (-e 'better.ini')
+	unless (-e $ENV{"HOME"} . "/.better")
 	{
  		print "Your are running Bettertron for the first time!\n";
 		print "Creating config file \"better.ini\"\n";
+		print "Creating config file .better in home directory\n";
 		print "Please read the README for how to fill out the config\n";
 		open (MYFILE, '>>better.ini');
+		open (MYFILE, ">> " . $ENV{"HOME"} . "/.better");
  		print MYFILE <<ENDHTML;
 [user]
 username=
@@ -56,6 +59,7 @@ sub getCfgValues
 {
 	#init config reading object
 	my $cfg = Config::IniFiles->new( -file => "better.ini" );
+	my $cfg = Config::IniFiles->new( -file => $ENV{"HOME"} . "/.better" );
 
 	#Get username and password from config file.
 	$username = $cfg -> val('user', 'username');
